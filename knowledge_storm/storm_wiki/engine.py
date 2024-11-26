@@ -129,9 +129,9 @@ class STORMWikiLMConfigs(LMConfigs):
 class STORMWikiRunnerArguments:
     """Arguments for controlling the STORM Wiki pipeline."""
 
-    output_dir: str = field(
-        metadata={"help": "Output directory for the results."},
-    )
+    # output_dir: str = field(
+    #     metadata={"help": "Output directory for the results."},
+    # )
     max_conv_turn: int = field(
         default=3,
         metadata={
@@ -226,14 +226,14 @@ class STORMWikiRunner(Engine):
             )
         )
 
-        FileIOHelper.dump_json(
-            conversation_log,
-            os.path.join(self.article_output_dir, "conversation_log.json"),
-        )
-        information_table.dump_url_to_info(
-            os.path.join(self.article_output_dir, "raw_search_results.json")
-        )
-        return information_table
+        # FileIOHelper.dump_json(
+        #     conversation_log,
+        #     os.path.join(self.article_output_dir, "conversation_log.json"),
+        # )
+        # information_table.dump_url_to_info(
+        #     os.path.join(self.article_output_dir, "raw_search_results.json")
+        # )
+        return conversation_log, information_table
 
     def run_outline_generation_module(
         self,
@@ -247,12 +247,12 @@ class STORMWikiRunner(Engine):
             return_draft_outline=True,
             callback_handler=callback_handler,
         )
-        outline.dump_outline_to_file(
-            os.path.join(self.article_output_dir, "storm_gen_outline.txt")
-        )
-        draft_outline.dump_outline_to_file(
-            os.path.join(self.article_output_dir, "direct_gen_outline.txt")
-        )
+        # outline.dump_outline_to_file(
+        #     os.path.join(self.article_output_dir, "storm_gen_outline.txt")
+        # )
+        # draft_outline.dump_outline_to_file(
+        #     os.path.join(self.article_output_dir, "direct_gen_outline.txt")
+        # )
         return outline
 
     def run_article_generation_module(
@@ -268,12 +268,12 @@ class STORMWikiRunner(Engine):
             article_with_outline=outline,
             callback_handler=callback_handler,
         )
-        draft_article.dump_article_as_plain_text(
-            os.path.join(self.article_output_dir, "storm_gen_article.txt")
-        )
-        draft_article.dump_reference_to_file(
-            os.path.join(self.article_output_dir, "url_to_info.json")
-        )
+        # draft_article.dump_article_as_plain_text(
+        #     os.path.join(self.article_output_dir, "storm_gen_article.txt")
+        # )
+        # draft_article.dump_reference_to_file(
+        #     os.path.join(self.article_output_dir, "url_to_info.json")
+        # )
         return draft_article
 
     def run_article_polishing_module(
@@ -285,10 +285,10 @@ class STORMWikiRunner(Engine):
             draft_article=draft_article,
             remove_duplicate=remove_duplicate,
         )
-        FileIOHelper.write_str(
-            polished_article.to_string(),
-            os.path.join(self.article_output_dir, "storm_gen_article_polished.txt"),
-        )
+        # FileIOHelper.write_str(
+        #     polished_article.to_string(),
+        #     os.path.join(self.article_output_dir, "storm_gen_article_polished.txt"),
+        # )
         return polished_article
 
     def post_run(self):
@@ -389,11 +389,13 @@ class STORMWikiRunner(Engine):
         os.makedirs(self.article_output_dir, exist_ok=True)
 
         # research module
+        # will dump [conversation_log.json] and [raw_search_results.json]
         information_table: StormInformationTable = None
         if do_research:
-            information_table = self.run_knowledge_curation_module(
+            conversation_log, information_table = self.run_knowledge_curation_module(
                 ground_truth_url=ground_truth_url, callback_handler=callback_handler
             )
+
         # outline generation module
         outline: StormArticle = None
         if do_generate_outline:

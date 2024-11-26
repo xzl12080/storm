@@ -96,6 +96,15 @@ class StormInformationTable(InformationTable):
             url_to_info[url] = url_to_info[url].to_dict()
         FileIOHelper.dump_json(url_to_info, path)
 
+    def dump_url_to_dict(self):
+        """
+        return url dict
+        """
+        url_to_info = copy.deepcopy(self.url_to_info)
+        for url in url_to_info:
+            url_to_info[url] = url_to_info[url].to_dict()
+        return url_to_info
+
     @classmethod
     def from_conversation_log_file(cls, path):
         conversation_log_data = FileIOHelper.load_json(path)
@@ -478,6 +487,11 @@ class StormArticle(Article):
     def dump_outline_to_file(self, file_path):
         outline = self.get_outline_as_list(add_hashtags=True, include_root=False)
         FileIOHelper.write_str("\n".join(outline), file_path)
+
+    def dump_outline_to_str(self):
+        """return outline string"""
+        outline = self.get_outline_as_list(add_hashtags=True, include_root=False)
+        return "\n".join(outline)
 
     def dump_reference_to_file(self, file_path):
         reference = copy.deepcopy(self.reference)
